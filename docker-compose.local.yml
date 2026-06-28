@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: medtech-postgres
+    ports:
+      - "54322:5432"
+    environment:
+      POSTGRES_DB: medtech_local
+      POSTGRES_USER: medtech_app
+      POSTGRES_PASSWORD: medtech_local_password
+    volumes:
+      - medtech_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medtech_app -d medtech_local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  medtech_pgdata:

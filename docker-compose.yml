@@ -1,0 +1,82 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: medtech-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: medtech
+      POSTGRES_USER: medtech_app
+      POSTGRES_PASSWORD: medtech_password
+    ports:
+      - "54322:5432"
+    volumes:
+      - medtech_pgdata:/var/lib/postgresql/data
+      - ./database/migrations/0001_core.sql:/docker-entrypoint-initdb.d/0001_core.sql:ro
+      - ./database/migrations/0002_business.sql:/docker-entrypoint-initdb.d/0002_business.sql:ro
+      - ./database/migrations/0003_hr_leave.sql:/docker-entrypoint-initdb.d/0003_hr_leave.sql:ro
+      - ./database/seeds/0001_roles_permissions.sql:/docker-entrypoint-initdb.d/1001_roles_permissions.sql:ro
+      - ./database/seeds/0002_master_data.sql:/docker-entrypoint-initdb.d/1002_master_data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medtech_app -d medtech"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medtech
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api
+    image: medtech-erp-api:latest
+    restart: unless-stopped
+    environment:
+      AUTH_MODE: local
+      DATABASE_URL: postgresql://medtech_app:medtech_password@postgres:5432/medtech
+      LOCAL_STORAGE_ROOT: /data/storage
+      PORT: 3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    volumes:
+      - medtech_storage:/data/storage
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - medtech
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+      args:
+        VITE_API_BASE_URL: http://localhost:3001
+    image: medtech-erp-web:latest
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - medtech
+
+networks:
+  medtech:
+    driver: bridge
+
+volumes:
+  medtech_pgdata:
+  medtech_storage:

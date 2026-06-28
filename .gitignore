@@ -1,0 +1,11 @@
+node_modules
+.next
+.env
+.env.local
+coverage
+dist
+.local-storage
+*.log
+.DS_Store
+graphify-out/
+raw/
