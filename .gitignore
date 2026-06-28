@@ -7,5 +7,4 @@ dist
 .local-storage
 *.log
 .DS_Store
-graphify-out/
 raw/

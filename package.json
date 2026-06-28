@@ -21,11 +21,7 @@
     "db:reset": "docker compose -f docker-compose.local.yml down -v && docker compose -f docker-compose.local.yml up -d && npm run db:wait && npm run db:migrate && npm run db:seed",
     "db:migrate": "sh -c 'set -a; . ./.env.local; set +a; psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/0001_core.sql && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/0002_business.sql && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/0003_hr_leave.sql'",
     "db:seed": "sh -c 'set -a; . ./.env.local; set +a; psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/seeds/0001_roles_permissions.sql && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/seeds/0002_master_data.sql'",
-    "db:types": "sh -c 'set -a; . ./.env.local; set +a; kysely-codegen --url \"$DATABASE_URL\" --out-file database/generated/db.ts'",
-    "graphify": "python -m graphify",
-    "graphify:extract": "python -m graphify update . --no-cluster",
-    "graphify:update": "python -m graphify update .",
-    "graphify:tree": "python -m graphify tree --graph graphify-out/graph.json --output graphify-out/GRAPH_TREE.html --root . --label medtech-erp"
+    "db:types": "sh -c 'set -a; . ./.env.local; set +a; kysely-codegen --url \"$DATABASE_URL\" --out-file database/generated/db.ts'"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.27",
