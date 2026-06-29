@@ -1,59 +1,71 @@
 # MedTech ERP
 
-Production-oriented enterprise resource planning platform for MedTech Corporation Trading W.L.L., Doha, Qatar. It provides one modular workspace for finance, HR, sales, procurement, inventory, shipping, after-sales service, turnkey projects, documents, approvals, reporting, and administration.
+MedTech ERP is a TypeScript/Node enterprise resource planning application for MedTech Corporation Trading W.L.L. It combines a Vite React frontend, a NestJS API, PostgreSQL data access through Kysely, SQL migrations/seeds, document storage, and PDF/Excel foundations.
 
-## Included
+The product shell covers finance, HR, sales, procurement, inventory, shipping, service, projects, documents, approvals, reports, and administration. The broad module navigation currently uses local scaffold data, while the HR leave workspace is the main connected end-to-end workflow backed by the API and PostgreSQL.
 
-- Premium responsive application shell, executive dashboard, global search/command palette, notifications, light/dark themes, operational list views, filters, KPIs, and role-aware navigation foundation.
-- PostgreSQL schema covering commercial, finance, supply chain, service, projects, HR, documents, approvals, activities, notifications, and immutable audit events.
-- NestJS API with Kysely, UUID keys, soft deletion, document sequences, local file-backed document storage, validation, and permission guards.
-- Branded A4 PDF engine and 12 configured templates: estimation, quotation, invoice, receipt, purchase order, delivery note, packing list, service report, employee letter, experience certificate, leave approval, and payment voucher.
-- Excel import/export foundations with per-row validation errors.
-- Docker Compose stack for PostgreSQL, the NestJS API, and the TanStack Router frontend, plus health endpoint, production notes, and a 12-role access matrix.
+## Quick Start
 
-## Local setup
-
-Prerequisites: Node.js 22+, npm 10+, and Docker.
+Prerequisites: Node.js 22+, npm 10+, Docker, and PostgreSQL client tools when using the local database scripts.
 
 ```bash
 npm ci
+cp .env.example .env.local
 docker compose up --build
 ```
 
-Open `http://localhost:8080`. The frontend is a Vite React app using TanStack Router. The backend is NestJS on `http://localhost:3001`, and PostgreSQL runs in Docker on host port `54322`.
+Open `http://localhost:8080`. The Docker stack runs PostgreSQL on host port `54322`, the API on `http://localhost:3001`, and the web app through Nginx on `http://localhost:8080`.
 
-For local development outside Docker, start PostgreSQL, run migrations/seeds, and then run the frontend and API separately:
+For split local development:
 
 ```bash
+npm ci
+cp .env.example .env.local
 npm run db:up
+npm run db:wait
 npm run db:migrate
 npm run db:seed
 npm run api:dev
 npm run web:dev
 ```
 
-## Project structure
+The Vite dev server runs on `http://localhost:5173`, the preview server on `http://localhost:4173`, and the API health check is `http://localhost:3001/health`.
+
+## Documentation
+
+- [Getting started](docs/GETTING_STARTED.md): local setup, environment, Docker, reset, and common startup problems.
+- [Architecture](docs/ARCHITECTURE.md): frontend, API, auth, permissions, data access, and current implementation boundaries.
+- [Database](docs/DATABASE.md): migration order, seeds, generated Kysely types, document sequences, audit triggers, and schema conventions.
+- [HR leave workflow](docs/HR_LEAVE_WORKFLOW.md): implemented leave application, approval, handover, clearance, rejoin, attachment, and PDF behavior.
+- [Development guide](docs/DEVELOPMENT_GUIDE.md): how to extend the app safely and what to validate before handoff.
+- [Production deployment](docs/PRODUCTION.md): production server, TLS, backup, and release notes.
+- [Role matrix](docs/ROLE_MATRIX.md): business roles, approval authority, and sensitive restrictions.
+- [Agent instructions](AGENTS.md): repository-specific instructions for coding agents.
+
+## Project Structure
 
 ```text
-src/                 Vite React entrypoint and TanStack Router tree
-apps/api/            NestJS API, guards, modules and Kysely services
-components/          ERP shell, dashboard, tables and reusable UI
-lib/pdf/             Branded PDF generator and template definitions
-lib/export/          Excel import/export
-database/migrations/ PostgreSQL schema, triggers and workflow controls
-database/seeds/      Roles, permissions, departments and master data
+src/                 Vite React entrypoint and TanStack Router route tree
+components/          ERP shell, dashboard, module workspaces, and reusable UI
+lib/                 Shared frontend/client helpers, validation, PDF, export, and static ERP data
+apps/api/            NestJS API, auth guards, modules, services, and Kysely provider
+database/migrations/ Versioned PostgreSQL schema and trigger SQL
+database/seeds/      Baseline roles, permissions, company, employee, and master data
+database/generated/  Kysely database types generated from the live schema
+templates/           Source templates used by document/PDF workflows
 deploy/              Nginx production configuration
-docs/                Deployment and role/access documentation
+docs/                Maintainer, workflow, deployment, and access documentation
 ```
 
-## Verification
+## Validation
+
+Use the existing npm scripts unless a task requires a narrower check:
 
 ```bash
 npm run typecheck
+npm run lint
 npm run build
 docker compose config
 ```
 
-Before go-live, configure the real legal address, CR/tax data, bank accounts, email provider, document terms, approval thresholds, product masters, opening stock, chart of accounts, and user-role assignments. Execute a user-acceptance cycle per department and a restore drill before importing production data.
-
-See [production deployment](docs/PRODUCTION.md) and [role matrix](docs/ROLE_MATRIX.md).
+Run `docker compose config` when Docker, deployment, or Compose behavior is touched.
