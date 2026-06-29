@@ -4,9 +4,8 @@ This guide is for local maintainers and agents setting up MedTech ERP from a cle
 
 ## Prerequisites
 
-- Node.js 22 or newer.
-- npm 10 or newer.
 - Docker with Docker Compose v2.
+- Node.js 22 or newer and npm 10 or newer when running npm scripts or split local development.
 - PostgreSQL client tools available on the host when running database scripts directly. The scripts use `psql` and `pg_isready`.
 
 ## Environment
@@ -33,8 +32,15 @@ Important variables:
 Use the full stack when you want PostgreSQL, the API, and the production-built web app together:
 
 ```bash
-npm ci
 docker compose up --build
+```
+
+This is the easiest path to share with other people after they clone the repository. It does not require installing npm packages on the host because the Docker image installs dependencies during the build.
+
+If Node.js is already installed, the same command is available as an npm alias:
+
+```bash
+npm run docker:up
 ```
 
 Services:
@@ -47,6 +53,18 @@ Services:
 | Database | Host port `54322` |
 
 The full Compose stack initializes the `medtech` database from `database/migrations/` and `database/seeds/` when the PostgreSQL volume is first created.
+
+Stop the full stack without deleting data:
+
+```bash
+docker compose down
+```
+
+Delete the database volume and rebuild from fresh seed data:
+
+```bash
+npm run docker:reset
+```
 
 ## Split Local Development
 

@@ -4,17 +4,29 @@ MedTech ERP is a TypeScript/Node enterprise resource planning application for Me
 
 The product shell covers finance, HR, sales, procurement, inventory, shipping, service, projects, documents, approvals, reports, and administration. The broad module navigation currently uses local scaffold data, while the HR leave workspace is the main connected end-to-end workflow backed by the API and PostgreSQL.
 
-## Quick Start
+## One-Command Docker Start
 
-Prerequisites: Node.js 22+, npm 10+, Docker, and PostgreSQL client tools when using the local database scripts.
+Prerequisite: Docker Desktop or Docker Engine with Docker Compose v2.
 
 ```bash
-npm ci
-cp .env.example .env.local
 docker compose up --build
 ```
 
 Open `http://localhost:8080`. The Docker stack runs PostgreSQL on host port `54322`, the API on `http://localhost:3001`, and the web app through Nginx on `http://localhost:8080`.
+
+Optional npm aliases are available if Node.js is already installed:
+
+```bash
+npm run docker:up
+npm run docker:down
+npm run docker:reset
+```
+
+Use `docker compose down -v` or `npm run docker:reset` when you want to delete the local database volume and start from fresh seed data.
+
+## Local Development
+
+Prerequisites: Node.js 22+, npm 10+, Docker, and PostgreSQL client tools when using the local database scripts.
 
 For split local development:
 

@@ -22,6 +22,7 @@ This project is a TypeScript/Node ERP application with a Vite React frontend, a 
   - `npm run typecheck`
   - `npm run lint`
   - `npm run build`
+  - `npm run docker:up`, `npm run docker:down`, `npm run docker:reset`
   - `npm run db:up`, `npm run db:wait`, `npm run db:migrate`, `npm run db:seed`, `npm run db:reset`
 - `npm run dev` and `npm run web:dev` start only the Vite frontend.
 - `npm run api:dev` starts the NestJS API with `.env.local`.
